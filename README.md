@@ -17,7 +17,7 @@
 - 위험도 단계화(Safe / Caution) 제공
 
 ## 시스템 아키텍처
-<img width="824" height="393" alt="image" src="https://github.com/user-attachments/assets/6e5bdb86-7718-4899-a77a-c6d9c571092d" />
+<img width="576" height="275" alt="image" src="https://github.com/user-attachments/assets/6e5bdb86-7718-4899-a77a-c6d9c571092d" />
 
 
 ## 기술 스택
@@ -26,7 +26,7 @@
 - AI: Azure Custom Vision, YOLO
 - Database: Azure Cosmos DB
 - Infra: Azure App Service
-<img width="1559" height="852" alt="스크린샷 2026-01-08 114542" src="https://github.com/user-attachments/assets/c4fb6d69-3489-4259-9ccb-4cfc5123ba09" />
+<img width="623" height="340" alt="스크린샷 2026-01-08 114542" src="https://github.com/user-attachments/assets/c4fb6d69-3489-4259-9ccb-4cfc5123ba09" />
 
 ## 주요 성과
 - 알약 인식 정확도 93% 이상
