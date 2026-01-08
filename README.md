@@ -32,11 +32,13 @@
 - 알약 인식 정확도 93% 이상
 - 데이터 불균형 문제 해결을 위한 오버샘플링 적용
 - 음식 6,000개 / 약물 3,000개 데이터 정제
-<img width="1336" height="687" alt="image" src="https://github.com/user-attachments/assets/41403546-3e7e-498d-9e03-8e0b486e4b76" />
-<img width="895" height="582" alt="image" src="https://github.com/user-attachments/assets/b23ea4c0-d1a7-4538-afec-572b1af614fb" />
-<img width="628" height="623" alt="image" src="https://github.com/user-attachments/assets/4feec535-4a92-4fa9-9d69-44d6315e261a" />
-<img width="583" height="607" alt="image" src="https://github.com/user-attachments/assets/9d7d0a28-7865-4c7a-a62f-fd4fd211369a" /><img width="564" height="700" alt="image" src="https://github.com/user-attachments/assets/bdaab86b-53b8-44a1-94a1-7608bcd19368" />
-
+<p align=1"left">
+  <<img width="534" height="300" alt="image" src="https://github.com/user-attachments/assets/41403546-3e7e-498d-9e03-8e0b486e4b76" />">
+  <img width="328" height="323" alt="image" src="https://github.com/user-attachments/assets/4feec535-4a92-4fa9-9d69-44d6315e261a" />
+</p>
+<p align=1"left">
+<img width="364" height="407" alt="image" src="https://github.com/user-attachments/assets/9d7d0a28-7865-4c7a-a62f-fd4fd211369a" /><img width="364" height="500" alt="image" src="https://github.com/user-attachments/assets/bdaab86b-53b8-44a1-94a1-7608bcd19368" />
+</p>
 
 ## 윤리 및 안전
 - 개인정보 미수집
