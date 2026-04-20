@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediPair — 박소현 AI 프로덕트 기획자</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #080d0f;
+    --bg2:      #0d1417;
+    --bg3:      #131c20;
+    --surface:  #192228;
+    --border:   rgba(255,255,255,0.07);
+    --accent:   #22d3ee;   /* cyan — medical/health */
+    --accent2:  #4ade80;   /* green — safe */
+    --accent3:  #fbbf24;   /* amber — caution */
+    --accent4:  #f87171;   /* red — danger */
+    --accent5:  #818cf8;   /* indigo — AI/vision */
+    --text:     #e0f2f9;
+    --muted:    #5b7a87;
+    --white:    #ffffff;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* noise texture */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999; opacity: 0.35;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 4rem;
+    background: rgba(8,13,15,0.88);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.1em; color: var(--white); }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--accent); border: 1px solid var(--accent); padding: 0.3rem 0.8rem; border-radius: 2px; opacity: 0.8; }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 8rem 4rem 4rem; gap: 4rem;
+    position: relative; overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute; width: 700px; height: 700px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(34,211,238,0.07) 0%, transparent 70%);
+    top: 40%; left: 40%; transform: translate(-50%,-50%);
+    pointer-events: none;
+  }
+  .hero-glow2 {
+    position: absolute; width: 350px; height: 350px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(74,222,128,0.05) 0%, transparent 70%);
+    bottom: 10%; right: 8%; pointer-events: none;
+  }
+
+  .hero-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--accent);
+    letter-spacing: 0.2em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 0.6rem;
+    margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-label::before { content: ''; width: 24px; height: 1px; background: var(--accent); }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.8rem, 7vw, 7rem); line-height: 0.92; color: var(--white);
+    margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.8s 0.35s forwards;
+  }
+  .hero-title .outline { color: transparent; -webkit-text-stroke: 1.5px var(--accent); }
+
+  .hero-sub {
+    font-size: 1rem; color: var(--muted); max-width: 480px;
+    margin-bottom: 2.5rem; opacity: 0; animation: fadeUp 0.8s 0.5s forwards; line-height: 1.85;
+  }
+  .hero-sub strong { color: var(--text); font-weight: 500; }
+
+  .hero-cta { display: flex; gap: 1rem; opacity: 0; animation: fadeUp 0.8s 0.65s forwards; }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--accent); color: #080d0f;
+    padding: 0.85rem 2rem; font-weight: 700; font-size: 0.85rem;
+    letter-spacing: 0.05em; text-decoration: none; border-radius: 3px; transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #67e8f9; transform: translateY(-2px); }
+
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    border: 1px solid var(--border); color: var(--text);
+    padding: 0.85rem 2rem; font-size: 0.85rem; letter-spacing: 0.05em;
+    text-decoration: none; border-radius: 3px; transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+  /* ── HERO MOCKUP — MediPair analysis UI ── */
+  .hero-mockup { opacity: 0; animation: fadeIn 1s 0.8s forwards; }
+
+  .mockup-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.65);
+  }
+  .mockup-bar {
+    background: var(--bg3); padding: 0.9rem 1.2rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #f85149; } .dot-y { background: #e3b341; } .dot-g { background: #3fb950; }
+  .mockup-title { margin-left: 0.8rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); }
+
+  .mockup-tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+  .m-tab {
+    padding: 0.6rem 1.1rem; font-size: 0.65rem; font-family: 'JetBrains Mono', monospace;
+    color: var(--muted); cursor: default; letter-spacing: 0.05em;
+  }
+  .m-tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+
+  .mockup-body { padding: 1.4rem; }
+
+  /* analysis result card */
+  .analysis-pair {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    align-items: center; gap: 0.8rem; margin-bottom: 1rem;
+  }
+  .med-item {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 0.8rem; text-align: center;
+  }
+  .med-icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+  .med-name { font-size: 0.72rem; font-weight: 700; color: var(--white); margin-bottom: 0.15rem; }
+  .med-sub { font-size: 0.58rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  .pair-arrow { font-size: 1.2rem; color: var(--muted); text-align: center; }
+
+  /* result badge */
+  .result-safe {
+    background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25);
+    border-radius: 6px; padding: 0.8rem; margin-bottom: 0.8rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .result-caution {
+    background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 6px; padding: 0.8rem; margin-bottom: 0.8rem;
+    display: flex; align-items: flex-start; gap: 0.6rem;
+  }
+  .result-icon { font-size: 1.1rem; flex-shrink: 0; }
+  .result-text h4 { font-size: 0.78rem; font-weight: 700; margin-bottom: 0.2rem; }
+  .result-text p  { font-size: 0.65rem; color: var(--muted); line-height: 1.5; }
+  .result-safe .result-text h4 { color: var(--accent2); }
+  .result-caution .result-text h4 { color: var(--accent3); }
+
+  /* stats mini row */
+  .stats-mini { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.5rem; margin-top: 0.8rem; }
+  .stat-mini {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 0.6rem; text-align: center;
+  }
+  .stat-mini .sm-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; color: var(--accent); line-height: 1; }
+  .stat-mini .sm-label { font-size: 0.55rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* scanning line animation */
+  .scan-line {
+    height: 2px; background: var(--bg3); border-radius: 2px; overflow: hidden; margin-top: 0.8rem;
+  }
+  .scan-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px; animation: scanAnim 3s ease-in-out infinite;
+  }
+  @keyframes scanAnim { 0%{width:0%} 60%{width:93%} 100%{width:100%} }
+
+  /* ── SECTION BASE ── */
+  section { padding: 8rem 4rem; }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.25em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.2rem;
+  }
+  .section-label::before { content: ''; width: 20px; height: 1px; background: var(--accent); }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.4rem, 4vw, 3.8rem);
+    color: var(--white); line-height: 1; letter-spacing: 0.02em; margin-bottom: 1rem;
+  }
+  .section-desc { color: var(--muted); font-size: 0.95rem; max-width: 560px; line-height: 1.8; }
+
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── BACKGROUND ── */
+  #background { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+  .bg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; margin-top: 4rem; align-items: start; }
+
+  .prob-list { display: flex; flex-direction: column; }
+  .prob-item { display: flex; align-items: flex-start; gap: 1.2rem; position: relative; }
+  .prob-item:not(:last-child)::after {
+    content: ''; position: absolute; left: 19px; top: 40px;
+    width: 1px; height: 100%; background: var(--border);
+  }
+  .prob-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0; position: relative; z-index: 1;
+  }
+  .prob-content { padding: 0 0 2.5rem; }
+  .prob-content h4 { font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 0.3rem; }
+  .prob-content p  { font-size: 0.8rem; color: var(--muted); }
+
+  .value-cards { display: flex; flex-direction: column; gap: 1rem; }
+  .value-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 6px; padding: 1.2rem 1.4rem;
+    transition: transform 0.2s, border-left-color 0.2s;
+  }
+  .value-card:hover { transform: translateX(4px); border-left-color: var(--accent2); }
+  .value-card h4 { font-size: 0.9rem; font-weight: 700; color: var(--white); margin-bottom: 0.4rem; }
+  .value-card p  { font-size: 0.8rem; color: var(--muted); }
+
+  /* ── FEATURES ── */
+  #features { position: relative; }
+
+  .features-header { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: end; margin-bottom: 4rem; }
+
+  /* 4-feature grid — 2+2 */
+  .feat-grid-4 {
+    display: grid; grid-template-columns: repeat(2,1fr);
+    gap: 1.5px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  }
+
+  .feat-block {
+    background: var(--bg); padding: 2.5rem;
+    position: relative; overflow: hidden; transition: background 0.3s;
+  }
+  .feat-block:hover { background: var(--surface); }
+
+  .feat-block::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(34,211,238,0.04) 0%, transparent 60%);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .feat-block:hover::before { opacity: 1; }
+
+  .feat-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 5rem; line-height: 1;
+    color: rgba(255,255,255,0.04);
+    position: absolute; top: 0.5rem; right: 1rem;
+  }
+
+  .feat-icon-wrap {
+    width: 48px; height: 48px;
+    background: rgba(34,211,238,0.08); border: 1px solid rgba(34,211,238,0.15);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 1.2rem;
+  }
+
+  .feat-block h3 { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 0.6rem; }
+  .feat-block p  { font-size: 0.82rem; color: var(--muted); line-height: 1.8; margin-bottom: 1rem; }
+
+  .feat-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .feat-tag {
+    font-size: 0.62rem; font-family: 'JetBrains Mono', monospace;
+    background: rgba(34,211,238,0.08); color: var(--accent);
+    border: 1px solid rgba(34,211,238,0.18);
+    padding: 0.2rem 0.5rem; border-radius: 2px;
+  }
+  .feat-tag.green { background: rgba(74,222,128,0.08); color: var(--accent2); border-color: rgba(74,222,128,0.18); }
+  .feat-tag.amber { background: rgba(251,191,36,0.08); color: var(--accent3); border-color: rgba(251,191,36,0.18); }
+  .feat-tag.indigo { background: rgba(129,140,248,0.08); color: var(--accent5); border-color: rgba(129,140,248,0.18); }
+
+  /* ── TECH ── */
+  #tech { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+  .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 4rem; }
+
+  /* challenges */
+  .challenge-list { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .ch-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.6rem; position: relative; overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .ch-card:hover { border-color: rgba(34,211,238,0.2); transform: translateY(-2px); }
+  .ch-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
+
+  .ch-num { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+  .ch-card h4 { font-size: 0.9rem; font-weight: 700; color: var(--white); margin-bottom: 0.5rem; }
+  .ch-problem { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.8rem; line-height: 1.7; }
+  .ch-sol-label { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.35rem; }
+  .ch-solution { font-size: 0.78rem; color: var(--text); line-height: 1.7; margin-bottom: 0.7rem; }
+  .ch-result {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent2);
+    background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2);
+    padding: 0.2rem 0.6rem; border-radius: 2px;
+  }
+  .ch-result::before { content: '✓'; }
+
+  /* performance + arch side */
+  .perf-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 2rem; }
+  .perf-box h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--white); margin-bottom: 1.4rem; letter-spacing: 0.05em; }
+
+  /* accuracy meter */
+  .accuracy-block { margin-bottom: 1.4rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--border); }
+  .accuracy-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.6rem; }
+  .accuracy-label { font-size: 0.8rem; color: var(--text); font-weight: 500; }
+  .accuracy-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: var(--accent); line-height: 1; }
+  .accuracy-bar { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+  .accuracy-fill { height: 100%; border-radius: 3px; animation: barGrow 1.5s ease-out; }
+  .af-93 { width: 93%; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  @keyframes barGrow { from { width: 0% } }
+
+  .data-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.4rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--border); }
+  .data-stat-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 0.9rem; text-align: center; }
+  .data-stat-item .ds-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--accent2); line-height: 1; margin-bottom: 0.2rem; }
+  .data-stat-item .ds-label { font-size: 0.62rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* risk levels */
+  .risk-levels { display: flex; gap: 0.6rem; margin-bottom: 1.4rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--border); }
+  .risk-level { flex: 1; border-radius: 6px; padding: 0.8rem; text-align: center; border: 1px solid; }
+  .rl-safe    { background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.2); }
+  .rl-caution { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.2); }
+  .rl-icon    { font-size: 1.2rem; display: block; margin-bottom: 0.3rem; }
+  .rl-name    { font-size: 0.68rem; font-weight: 700; margin-bottom: 0.15rem; }
+  .rl-safe .rl-name { color: var(--accent2); }
+  .rl-caution .rl-name { color: var(--accent3); }
+  .rl-desc { font-size: 0.58rem; color: var(--muted); }
+
+  /* tech stack table */
+  .stack-rows { display: flex; flex-direction: column; }
+  .stack-row {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: 0.8rem 1.2rem; align-items: center;
+    padding: 0.7rem 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .stack-row:last-child { border-bottom: none; }
+  .stack-label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--accent5); white-space: nowrap; }
+  .stack-tech span {
+    display: inline-block; background: var(--bg3); border: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--muted);
+    padding: 0.12rem 0.4rem; border-radius: 2px; margin: 0.1rem 0.12rem 0.1rem 0;
+  }
+
+  /* ── IMPACT ── */
+  #impact { position: relative; }
+
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4,1fr);
+    gap: 1.5px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 4rem;
+  }
+  .stat-cell { background: var(--bg); padding: 2.5rem 2rem; text-align: center; transition: background 0.3s; }
+  .stat-cell:hover { background: var(--surface); }
+  .stat-cell .big { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; color: var(--accent); line-height: 1; margin-bottom: 0.4rem; }
+  .stat-cell .big.green  { color: var(--accent2); }
+  .stat-cell .big.amber  { color: var(--accent3); }
+  .stat-cell .big.indigo { color: var(--accent5); }
+  .stat-cell .label { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+  .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem; }
+  .role-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 2rem; position: relative; overflow: hidden;
+  }
+  .role-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .role-card h3 { font-size: 0.85rem; font-weight: 700; color: var(--white); margin-bottom: 1rem; }
+  .role-item { display: flex; align-items: flex-start; gap: 0.7rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.8rem; color: var(--text); }
+  .role-item:last-child { border-bottom: none; }
+  .role-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 0.55rem; }
+
+  /* ── ABOUT ── */
+  #about { background: var(--bg2); border-top: 1px solid var(--border); }
+
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; margin-top: 4rem; }
+  .about-name { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; color: var(--white); letter-spacing: 0.05em; line-height: 1; margin-bottom: 0.5rem; }
+  .about-role { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 2rem; }
+  .about-text { font-size: 0.9rem; color: var(--muted); line-height: 1.9; margin-bottom: 2rem; }
+
+  .skill-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .chip { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; background: var(--bg); border: 1px solid var(--border); color: var(--muted); padding: 0.35rem 0.8rem; border-radius: 2px; transition: border-color 0.2s, color 0.2s; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .h-cards { display: flex; flex-direction: column; gap: 1rem; }
+  .h-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.4rem; display: flex; gap: 1rem; align-items: flex-start; transition: border-color 0.2s; }
+  .h-card:hover { border-color: rgba(34,211,238,0.2); }
+  .h-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .h-content h4 { font-size: 0.85rem; font-weight: 700; color: var(--white); margin-bottom: 0.3rem; }
+  .h-content p  { font-size: 0.78rem; color: var(--muted); line-height: 1.7; }
+
+  /* ── FOOTER ── */
+  footer { padding: 3rem 4rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--white); letter-spacing: 0.1em; }
+  .footer-logo span { color: var(--accent); }
+  .footer-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--muted); text-align: center; line-height: 1.8; }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--accent); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Medi<span>Pair</span></div>
+  <ul class="nav-links">
+    <li><a href="#background">기획배경</a></li>
+    <li><a href="#features">핵심기능</a></li>
+    <li><a href="#tech">기술챌린지</a></li>
+    <li><a href="#impact">성과</a></li>
+    <li><a href="#about">기획자</a></li>
+  </ul>
+  <div class="nav-tag">HealthTech AI</div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
+  <div>
+    <div class="hero-label">AI Product Portfolio · 박소현</div>
+    <h1 class="hero-title">
+      알약과 음식,<br>함께 먹어도<br><span class="outline">안전한가?</span>
+    </h1>
+    <p class="hero-sub">
+      알약 사진과 음식 사진 하나로 <strong>약물-음식 상호작용 위험</strong>을 즉시 분석합니다. Azure Custom Vision과 YOLOv11 기반 AI가 93% 정확도로 식별하고, 누구나 이해할 수 있는 직관적 안전 가이드를 제공합니다.
+    </p>
+    <div class="hero-cta">
+      <a href="#features" class="btn-primary">핵심 기능 보기 →</a>
+      <a href="#tech" class="btn-ghost">기술 성과</a>
+    </div>
+  </div>
+
+  <!-- MediPair App Mockup -->
+  <div class="hero-mockup">
+    <div class="mockup-card">
+      <div class="mockup-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="mockup-title">MediPair · AI SAFETY GUIDE</span>
+      </div>
+      <div class="mockup-tabs">
+        <div class="m-tab active">분석 결과</div>
+        <div class="m-tab">알약 인식</div>
+        <div class="m-tab">음식 탐지</div>
+      </div>
+      <div class="mockup-body">
+
+        <!-- pair display -->
+        <div class="analysis-pair">
+          <div class="med-item">
+            <span class="med-icon">💊</span>
+            <div class="med-name">뉴톤연질캡슐</div>
+            <div class="med-sub">근육통 · 소염제</div>
+          </div>
+          <div class="pair-arrow">⇄</div>
+          <div class="med-item">
+            <span class="med-icon">🥩</span>
+            <div class="med-name">갈비</div>
+            <div class="med-sub">음식</div>
+          </div>
+        </div>
+
+        <!-- safe result -->
+        <div class="result-safe">
+          <div class="result-icon">✅</div>
+          <div class="result-text">
+            <h4>안전합니다</h4>
+            <p>특별한 상호작용이 발견되지 않았습니다.</p>
+          </div>
+        </div>
+
+        <!-- caution example -->
+        <div class="result-caution">
+          <div class="result-icon">⚠️</div>
+          <div class="result-text">
+            <h4>주의가 필요합니다</h4>
+            <p>이 약물과 음식은 함께 섭취 시 상호작용이 발생할 수 있습니다. 주의 성분: 대두(콩), 땅콩 등</p>
+          </div>
+        </div>
+
+        <!-- scan bar -->
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--muted);margin-bottom:0.3rem;">AI ANALYZING · CONFIDENCE 93%</div>
+        <div class="scan-line"><div class="scan-fill"></div></div>
+
+        <!-- mini stats -->
+        <div class="stats-mini">
+          <div class="stat-mini">
+            <div class="sm-num">93<span style="font-size:0.8rem;">%</span></div>
+            <div class="sm-label">Accuracy</div>
+          </div>
+          <div class="stat-mini">
+            <div class="sm-num" style="color:var(--accent2);">2</div>
+            <div class="sm-label">Risk Levels</div>
+          </div>
+          <div class="stat-mini">
+            <div class="sm-num" style="color:var(--accent3);">9K+</div>
+            <div class="sm-label">Dataset</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BACKGROUND -->
+<section id="background">
+  <div class="section-label">01 · Background</div>
+  <h2 class="section-title">기획 배경 &<br>서비스 핵심 가치</h2>
+
+  <div class="bg-grid">
+    <div>
+      <p class="section-desc" style="margin-bottom:2rem;">약물-음식 상호작용 정보는 전문 서적에 흩어져 있어 일반인이 쉽게 확인하기 어렵습니다. 특히 고령자와 다약제 복용자의 오남용 위험이 증가하는 상황에서, 누구나 즉시 확인할 수 있는 AI 안전 가이드가 필요했습니다.</p>
+
+      <div class="prob-list">
+        <div class="prob-item">
+          <div class="prob-icon">🔍</div>
+          <div class="prob-content">
+            <h4>약물-음식 상호작용 정보 분산</h4>
+            <p>정보가 전문 의약 서적·처방전에 흩어져 있어 일반인이 즉시 확인하기 어려움</p>
+          </div>
+        </div>
+        <div class="prob-item">
+          <div class="prob-icon">👴</div>
+          <div class="prob-content">
+            <h4>고령자·다약제 복용자 오남용 위험</h4>
+            <p>여러 약을 동시에 복용하는 환자군에서 상호작용 부작용 위험 급증</p>
+          </div>
+        </div>
+        <div class="prob-item">
+          <div class="prob-icon">📚</div>
+          <div class="prob-content">
+            <h4>전문성 중심 정보의 낮은 접근성</h4>
+            <p>의학 용어 중심 안내로 일반 사용자가 이해하기 어려운 구조</p>
+          </div>
+        </div>
+        <div class="prob-item">
+          <div class="prob-icon">💡</div>
+          <div class="prob-content">
+            <h4>직관적 AI 안전 가이드 부재</h4>
+            <p>사진 한 장으로 즉시 위험도를 판단할 수 있는 서비스가 없음</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="value-cards reveal">
+      <div class="value-card">
+        <h4>📸 이미지 기반 즉시 안전 확인</h4>
+        <p>알약·음식 사진만으로 상호작용 위험을 즉시 안내합니다. 텍스트 입력 없이 카메라만으로 분석 가능합니다.</p>
+      </div>
+      <div class="value-card">
+        <h4>✅ 누구나 이해하는 직관적 안전 가이드</h4>
+        <p>Safe / Caution 2단계 위험도 분류로 의학 지식 없이도 즉시 이해할 수 있는 인터페이스를 설계했습니다.</p>
+      </div>
+      <div class="value-card">
+        <h4>🏥 정보 소외 계층 접근성 강화</h4>
+        <p>고령자·디지털 취약 계층도 쉽게 사용할 수 있도록 복잡한 입력 없이 이미지만으로 작동하는 UX를 구현했습니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="features-header">
+    <div>
+      <div class="section-label">02 · Core Features</div>
+      <h2 class="section-title">4가지<br>핵심 기능</h2>
+    </div>
+    <p class="section-desc">알약 인식·음식 탐지·상호작용 DB 구축·결과 시각화. 4가지 기능이 파이프라인으로 연결되어 사진 한 장으로 안전 여부를 즉시 제공합니다.</p>
+  </div>
+
+  <div class="feat-grid-4 reveal">
+    <div class="feat-block">
+      <div class="feat-num">1</div>
+      <div class="feat-icon-wrap">💊</div>
+      <h3>알약 인식 (Pill Recognition)</h3>
+      <p>Azure Custom Vision Cognitive Services로 다양한 모양·색상의 알약을 정확히 식별합니다. 제형 특징 학습으로 분류 모델을 최적화했습니다.</p>
+      <div class="feat-tags">
+        <span class="feat-tag">Azure Custom Vision</span>
+        <span class="feat-tag indigo">이미지 분류</span>
+        <span class="feat-tag">93% 정확도</span>
+      </div>
+    </div>
+
+    <div class="feat-block">
+      <div class="feat-num">2</div>
+      <div class="feat-icon-wrap">🍽</div>
+      <h3>음식 인식 (Food Detection)</h3>
+      <p>OpenCV + YOLOv11 기반 실시간 한국 음식 객체 탐지. 한국 음식 데이터 기반으로 다중 객체 인식이 가능하며 사용자가 섭취하려는 음식을 자동 탐지·분류합니다.</p>
+      <div class="feat-tags">
+        <span class="feat-tag green">YOLOv11</span>
+        <span class="feat-tag green">OpenCV</span>
+        <span class="feat-tag">실시간 탐지</span>
+      </div>
+    </div>
+
+    <div class="feat-block">
+      <div class="feat-num">3</div>
+      <div class="feat-icon-wrap">🗄</div>
+      <h3>상호작용 DB 구축</h3>
+      <p>공공 데이터를 활용해 약물·음식 위험도를 Safe / Caution 2단계로 체계적으로 분류했습니다. Azure SQL과 Open Data를 결합한 전문 의약 정보 시각화를 구현했습니다.</p>
+      <div class="feat-tags">
+        <span class="feat-tag amber">Safe / Caution 분류</span>
+        <span class="feat-tag">Azure SQL</span>
+        <span class="feat-tag">공공 데이터</span>
+      </div>
+    </div>
+
+    <div class="feat-block">
+      <div class="feat-num">4</div>
+      <div class="feat-icon-wrap">📊</div>
+      <h3>결과 시각화 & 안내</h3>
+      <p>약물-음식 상호작용 분석 결과를 직관적 UI로 즉시 표시합니다. 주의 성분 명시, 복약 안내 메시지, 다른 조합 확인 기능으로 사용 편의성을 극대화했습니다.</p>
+      <div class="feat-tags">
+        <span class="feat-tag">직관적 UI/UX</span>
+        <span class="feat-tag green">주의 성분 명시</span>
+        <span class="feat-tag">복약 안내</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH -->
+<section id="tech">
+  <div class="section-label">03 · Performance & Architecture</div>
+  <h2 class="section-title">기술 성과 &<br>아키텍처 Deep Dive</h2>
+  <p class="section-desc">이미지 전처리 파이프라인 강화와 데이터 불균형 해결로 93% 인식 정확도를 달성했습니다. 9,000+ 학습 데이터셋을 직접 구축했습니다.</p>
+
+  <div class="tech-grid reveal">
+    <div class="challenge-list">
+      <div class="ch-card">
+        <div class="ch-num">ACHIEVEMENT 01</div>
+        <h4>알약 인식 정확도 93% 달성</h4>
+        <p class="ch-problem">다양한 모양·색상의 알약을 카메라로 정확히 분류하는 것이 핵심 기술 과제였습니다. 조명 환경, 촬영 각도, 유사한 제형 간 구분이 특히 어려웠습니다.</p>
+        <div class="ch-sol-label">해결 전략</div>
+        <p class="ch-solution">이미지 전처리 파이프라인 강화(노이즈 제거·대비 조정·리사이징)와 Azure Custom Vision 모델 최적화로 제형 특징을 정밀 학습했습니다.</p>
+        <span class="ch-result">알약 인식 정확도 93% 달성</span>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">ACHIEVEMENT 02</div>
+        <h4>9,000+ 대규모 데이터셋 구축</h4>
+        <p class="ch-problem">한국 음식 및 주요 처방 약물 이미지 데이터가 부족해 모델 학습에 필요한 양질의 데이터셋을 직접 구축해야 했습니다.</p>
+        <div class="ch-sol-label">해결 전략</div>
+        <p class="ch-solution">Food 6,000+ / Drug 3,000+ 이미지 데이터를 직접 수집·라벨링했습니다. 특정 클래스 데이터 부족 문제는 오버샘플링(Oversampling) 기법으로 해결했습니다.</p>
+        <span class="ch-result">총 9,000+ 학습 데이터 · 인식률 편차 최소화</span>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">ACHIEVEMENT 03</div>
+        <h4>데이터 불균형 문제 해결</h4>
+        <p class="ch-problem">특정 클래스(희귀 약물, 특정 음식)의 데이터가 다른 클래스에 비해 현저히 부족해 모델이 편향 학습되는 문제가 발생했습니다.</p>
+        <div class="ch-sol-label">해결 전략</div>
+        <p class="ch-solution">오버샘플링 기법을 적용해 클래스 간 데이터 균형을 맞추고, 데이터 증강(Augmentation)으로 다양한 환경에서의 인식률을 향상했습니다.</p>
+        <span class="ch-result">인식률 편차 최소화 · 전체 클래스 균등 성능</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="perf-box">
+        <h3>성과 & 스택</h3>
+
+        <!-- accuracy meter -->
+        <div class="accuracy-block">
+          <div class="accuracy-header">
+            <span class="accuracy-label">알약 인식 정확도</span>
+            <span class="accuracy-num">93<span style="font-size:1.2rem;">%</span></span>
+          </div>
+          <div class="accuracy-bar">
+            <div class="accuracy-fill af-93"></div>
+          </div>
+        </div>
+
+        <!-- dataset stats -->
+        <div class="data-stats">
+          <div class="data-stat-item">
+            <div class="ds-num">6K+</div>
+            <div class="ds-label">Food Images</div>
+          </div>
+          <div class="data-stat-item">
+            <div class="ds-num">3K+</div>
+            <div class="ds-label">Drug Images</div>
+          </div>
+        </div>
+
+        <!-- risk levels -->
+        <div class="risk-levels">
+          <div class="risk-level rl-safe">
+            <span class="rl-icon">✅</span>
+            <div class="rl-name">SAFE</div>
+            <div class="rl-desc">상호작용 없음</div>
+          </div>
+          <div class="risk-level rl-caution">
+            <span class="rl-icon">⚠️</span>
+            <div class="rl-name">CAUTION</div>
+            <div class="rl-desc">주의 필요</div>
+          </div>
+        </div>
+
+        <!-- tech stack -->
+        <div class="stack-rows">
+          <div class="stack-row">
+            <div class="stack-label">VISION AI</div>
+            <div class="stack-tech"><span>Azure Custom Vision</span><span>YOLOv11</span></div>
+          </div>
+          <div class="stack-row">
+            <div class="stack-label">BACKEND</div>
+            <div class="stack-tech"><span>FastAPI</span><span>Python</span><span>OpenCV</span></div>
+          </div>
+          <div class="stack-row">
+            <div class="stack-label">FRONTEND</div>
+            <div class="stack-tech"><span>React</span><span>Gradio</span></div>
+          </div>
+          <div class="stack-row">
+            <div class="stack-label">DATABASE</div>
+            <div class="stack-tech"><span>Azure Cosmos DB</span><span>SQL</span></div>
+          </div>
+          <div class="stack-row">
+            <div class="stack-label">INFRA</div>
+            <div class="stack-tech"><span>Azure App Service</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section id="impact">
+  <div class="section-label">04 · Impact & Role</div>
+  <h2 class="section-title">프로젝트 성과 &<br>기획 역할</h2>
+
+  <div class="stats-row reveal">
+    <div class="stat-cell">
+      <div class="big">93<span style="font-size:2rem;">%</span></div>
+      <div class="label">알약 인식 정확도<br>Azure Custom Vision</div>
+    </div>
+    <div class="stat-cell">
+      <div class="big green">9K<span style="font-size:2rem;">+</span></div>
+      <div class="label">학습 데이터셋<br>Food 6K + Drug 3K</div>
+    </div>
+    <div class="stat-cell">
+      <div class="big amber">2</div>
+      <div class="label">위험도 분류 레벨<br>Safe / Caution</div>
+    </div>
+    <div class="stat-cell">
+      <div class="big indigo">RT</div>
+      <div class="label">실시간 객체 탐지<br>YOLOv11 기반</div>
+    </div>
+  </div>
+
+  <div class="role-grid reveal">
+    <div class="role-card">
+      <h3>👩‍💼 기획 역할 (PM)</h3>
+      <div class="role-item"><div class="role-dot"></div>데이터 수집 및 DB 구축 기획</div>
+      <div class="role-item"><div class="role-dot"></div>모델 설계 방향 정의 및 팀 지원</div>
+      <div class="role-item"><div class="role-dot"></div>Safe/Caution 2단계 위험도 분류 체계 설계</div>
+      <div class="role-item"><div class="role-dot"></div>정보 소외 계층을 위한 직관적 UI/UX 기획</div>
+      <div class="role-item"><div class="role-dot"></div>PoC → MVP 전환 및 Vision 모델 최적화 기반 상용화 설계</div>
+    </div>
+
+    <div class="role-card">
+      <h3>🏆 핵심 성과 요약</h3>
+      <div class="role-item"><div class="role-dot"></div>알약 인식 정확도 93% 달성 (이미지 전처리 파이프라인 강화)</div>
+      <div class="role-item"><div class="role-dot"></div>총 9,000+ 학습 데이터셋 직접 구축 및 데이터 불균형 해결</div>
+      <div class="role-item"><div class="role-dot"></div>약물-음식 위험도 Safe/Caution 2단계 분류 체계 완성</div>
+      <div class="role-item"><div class="role-dot"></div>사진 한 장으로 즉시 안전 확인하는 UX 플로우 설계</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">05 · About</div>
+  <div class="about-grid">
+    <div>
+      <div class="about-name">박소현</div>
+      <div class="about-role">AI PRODUCT PLANNER · PM</div>
+      <p class="about-text">
+        고령자와 다약제 복용자가 약물-음식 상호작용 정보에 쉽게 접근하지 못하는 문제를 AI로 해결하고자 MediPair를 기획했습니다. 전문성 높은 의학 정보를 직관적인 이미지 기반 인터페이스로 재설계하고, Safe/Caution 2단계 분류 체계로 누구나 이해할 수 있는 안전 가이드를 만들었습니다.
+      </p>
+      <div class="skill-chips">
+        <span class="chip">PM</span>
+        <span class="chip">HealthTech AI</span>
+        <span class="chip">Azure Custom Vision</span>
+        <span class="chip">YOLOv11</span>
+        <span class="chip">데이터셋 구축</span>
+        <span class="chip">Vision AI</span>
+        <span class="chip">UI/UX 설계</span>
+        <span class="chip">상용화 기획</span>
+      </div>
+    </div>
+
+    <div class="h-cards">
+      <div class="h-card">
+        <div class="h-icon">🏥</div>
+        <div class="h-content">
+          <h4>의료 정보 접근성을 UX로 해결</h4>
+          <p>전문가만 이해할 수 있던 약물-음식 상호작용 정보를 사진 한 장과 Safe/Caution 2단계 분류로 누구나 즉시 이해할 수 있도록 재설계했습니다.</p>
+        </div>
+      </div>
+      <div class="h-card">
+        <div class="h-icon">📊</div>
+        <div class="h-content">
+          <h4>9,000+ 데이터셋 직접 구축한 PM</h4>
+          <p>단순 기획을 넘어 Food 6,000+ / Drug 3,000+ 이미지 데이터를 직접 수집·라벨링하고 데이터 불균형 문제를 오버샘플링으로 해결했습니다.</p>
+        </div>
+      </div>
+      <div class="h-card">
+        <div class="h-icon">🚀</div>
+        <div class="h-content">
+          <h4>PoC에서 상용화 가능 구조로</h4>
+          <p>Vision 모델 최적화 기반 상용화 설계를 기획하여 프로토타입을 실제 서비스화할 수 있는 아키텍처와 UX 플로우를 설계했습니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Medi<span>Pair</span></div>
+  <div class="footer-meta">
+    HealthTech AI Portfolio · 박소현<br>
+    <span style="font-size:0.6rem;opacity:0.5;">Azure Custom Vision · YOLOv11 · OpenCV · FastAPI · Azure Cosmos DB</span>
+  </div>
+  <div class="footer-links">
+    <a href="#hero">↑ 맨 위로</a>
+    <a href="#background">기획배경</a>
+    <a href="#tech">기술성과</a>
+  </div>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 200) current = s.id; });
+    navLinks.forEach(a => { a.style.color = a.getAttribute('href') === `#${current}` ? 'var(--accent)' : ''; });
+  });
+</script>
+</body>
+</html>
